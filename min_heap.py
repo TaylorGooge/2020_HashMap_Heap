@@ -44,6 +44,18 @@ class MinHeap:
         """
         return self.heap.length() == 0
 
+    def has_left_child(self, node, da_length):
+        if 2 * node + 1 >= da_length:
+            return False
+        else:
+            return True
+
+    def has_right_child(self, node, da_length):
+        if 2 * node + 2 >= da_length:
+            return False
+        else:
+            return True
+
     def add_helper(self, node, parent):
         """
         Helper function for add(). This function calls itself until the MinHeap property
@@ -57,7 +69,7 @@ class MinHeap:
         else:
 
             next_loc = parent
-            next_parent = int((next_loc-1)/2)
+            next_parent = int((next_loc - 1) / 2)
             self.heap.swap(node, parent)
             return self.add_helper(next_loc, next_parent)
 
@@ -70,11 +82,11 @@ class MinHeap:
         self.heap.append(node)
         node_loc = self.heap.length()
 
-        if node_loc == 1 :
+        if node_loc == 1:
             pass
         else:
             node_loc = node_loc - 1
-            node_parent = int((node_loc-1)/2)
+            node_parent = int((node_loc - 1) / 2)
             if self.heap.get_at_index(node_loc) < self.heap.get_at_index(node_parent):
                 self.add_helper(node_loc, node_parent)
             else:
@@ -90,7 +102,7 @@ class MinHeap:
         else:
             return self.heap.get_at_index(0)
 
-    def remove_min_helper(self, node = 0):
+    def remove_min_helper(self, node=0):
         """
         This function is a helper function for remove_min(). This function removes the smallest
         node and restores the MinHeap property.
@@ -122,7 +134,6 @@ class MinHeap:
             else:
                 return
 
-
     def remove_min(self) -> object:
         """
         This function removes the smallest node and restores the MinHeap property.
@@ -137,7 +148,6 @@ class MinHeap:
             self.remove_min_helper()
             return removed_node
 
-
     def build_heap_helper(self, da, non_leaf):
         """
         This function is a helper function for build_heap(). This function takes a dynamic array
@@ -146,51 +156,23 @@ class MinHeap:
         :param non_leaf: The non-leaf node currently being heapified.
         :return: None
         """
-        non_leaf_left = 2 * non_leaf + 1
-        non_leaf_right = 2 * non_leaf + 2
-        last_index = da.length() - 1
 
-
-        # if the first nonleaf node is complete
-        if non_leaf_right > last_index or non_leaf_left > last_index:
-            if non_leaf_left == last_index:
-                if da.get_at_index(non_leaf_left) < da.get_at_index(non_leaf):
-                    da.swap(non_leaf, non_leaf_left)
-                    return self.build_heap_helper(da, non_leaf - 1)
+        if non_leaf >= 0:
+            if self.has_right_child(non_leaf, da.length()) is True and self.has_left_child(non_leaf, da.length()) is True:
+                if da.get_at_index(2 * non_leaf + 1) < da.get_at_index(2 * non_leaf + 2):
+                    swap = 2 * non_leaf + 1
                 else:
-                    return self.build_heap_helper(da, non_leaf - 1)
-            else:
-                return self.build_heap_helper(da, non_leaf - 1)
-        # if non_leaf is 0:
-        if non_leaf == 0:
+                    swap = 2 * non_leaf + 2
 
-            if da.get_at_index(non_leaf_left) < da.get_at_index(non_leaf) or da.get_at_index(
-                    non_leaf_right) < da.get_at_index(non_leaf):
-                if da.get_at_index(non_leaf_left) <= da.get_at_index(non_leaf_right):
-                    swap_node = non_leaf_left
-                else:
-                    swap_node = non_leaf_right
-                da.swap(non_leaf, swap_node)
-                return
-            else:
-                return
-        else:
-            if da.get_at_index(non_leaf_left) < da.get_at_index(non_leaf) or da.get_at_index(
-                    non_leaf_right) < da.get_at_index(non_leaf):
-                if da.get_at_index(non_leaf_left) <= da.get_at_index(non_leaf_right):
-                    swap_node = non_leaf_left
-                else:
-                    swap_node = non_leaf_right
-                da.swap(non_leaf, swap_node)
-                return self.build_heap_helper(da, non_leaf - 1)
-            else:
-                return self.build_heap_helper(da, non_leaf - 1)
+                if da.get_at_index(non_leaf) > da.get_at_index(swap):
+                    da.swap(non_leaf, swap)
+                self.build_heap_helper(da, non_leaf - 1)
+            elif self.has_left_child(non_leaf, da.length()) is True:
+                if da.get_at_index(non_leaf) > da.get_at_index(2 * non_leaf + 1):
+                    da.swap(non_leaf, 2 * non_leaf + 1)
+                self.build_heap_helper(da, non_leaf - 1)
 
-
-
-
-
-    def build_heap(self, da: DynamicArray ) -> None:
+    def build_heap(self, da: DynamicArray) -> None:
         """
         This function takes a DynamicArray object and builds a heap that satisfies the MinHeap
         property.
@@ -198,73 +180,13 @@ class MinHeap:
         :return: None
         """
 
-        non_leaf = int((da.length()/2)-1)
+        non_leaf = int((da.length() / 2) - 1)
         da_copy = DynamicArray()
 
-        for i in range(0,da.length()):
+        for i in range(0, da.length()):
             temp_val = da.get_at_index(i)
             da_copy.append(temp_val)
 
-
         self.build_heap_helper(da_copy, non_leaf)
+
         self.heap = da_copy
-
-
-
-
-
-# BASIC TESTING
-if __name__ == '__main__':
-    pass
-
-    # print("\nPDF - add example 1")
-    # print("-------------------")
-    # h = MinHeap()
-    # print(h, h.is_empty())
-    # for value in range(300, 200, -15):
-    #     h.add(value)
-    #     print(h)
-    # #
-    # print("\nPDF - add example 2")
-    # print("-------------------")
-    # h = MinHeap(['fish', 'bird'])
-    # print(h)
-    # for value in ['monkey', 'zebra', 'elephant', 'horse', 'bear']:
-    #     h.add(value)
-    #     print(h)
-
-    #
-    # print("\nPDF - get_min example 1")
-    # print("-----------------------")
-    # h = MinHeap(['fish', 'bird'])
-    # print(h)
-    # print(h.get_min(), h.get_min())
-    #
-    #
-    # print("\nPDF - remove_min example 1")
-    # print("--------------------------")
-    # h = MinHeap([1, 10, 2, 9, 3, 8, 4, 7, 5, 6])
-    # while not h.is_empty():
-    #     print(h, end=' ')
-    #     print(h.remove_min())
-
-
-
-
-    #
-    #
-    # print("\nPDF - build_heap example 1")
-    # print("--------------------------")
-    # da = DynamicArray([100, 20, 6, 200, 90, 150, 300])
-    # h = MinHeap(['zebra', 'apple'])
-    # print(h)
-    # h.build_heap(da)
-    # print(h)
-    # da.set_at_index(0, 500)
-    # print(da)
-    # print(h)
-    #
-    # da = DynamicArray([486, -572, 871, -390, 533, 347, -14, -318, -854, 717,])
-    # h = MinHeap()
-    # h.build_heap(da)
-    # print(h)
